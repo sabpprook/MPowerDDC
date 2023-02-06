@@ -121,9 +121,34 @@
     <value>17, 17</value>
   </metadata>
   <metadata name="contextMenuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>134, 17</value>
+    <value>223, 17</value>
   </metadata>
-  <metadata name="timer_GetMonitor.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>297, 17</value>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="toolStrip_DisplayPort_1.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABgAAAAVCAYAAABc6S4mAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        wAAADsABataJCQAAAUdJREFUSEu1lUurgzAQhYOICFI3grhxrSgobnwrLvz/fyl1cjkyjbH2cSt8WmbO
+        5DAmU8U8z1II8Ta32032fS+3SzzjYwPgeZ4sy3Jb60cGwLbtbb0fGoCu67Z1LwziOH4QcZZlkWmaStd1
+        D3WWZakn1z8YQEAxLjqD3j1qOY7jbOk/jbGDtm13wTiOcpomBf1GHDRNc6gn6rpWWmMHVETJdV33nA5/
+        11EUHfJ0jClnNOAdUAxwDQENgRhHxa8MkDMRBMGu48aABvErAzpJ0NEc6Pksy74z+JcOKAagA9AQeo5Q
+        cZPBu6coDMND3vd9lTca8OKrOaDzjnrO0zl45W+YKIpir+WcTrKpAx3qJEkStQjq9Hqu/3gPzhiGQdUC
+        o8Grk8w5/R7QxulibJASaDkd+qJVVbXrddQtz3M1dXhyAY/rcJ0ZKe649kKptxzqkwAAAABJRU5ErkJg
+        gg==
+</value>
+  </data>
+  <data name="toolStrip_DisplayPort_2.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABgAAAAVCAYAAABc6S4mAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        wAAADsABataJCQAAAUdJREFUSEu1lUurgzAQhYOICFI3grhxrSgobnwrLvz/fyl1cjkyjbH2cSt8WmbO
+        5DAmU8U8z1II8Ta32032fS+3SzzjYwPgeZ4sy3Jb60cGwLbtbb0fGoCu67Z1LwziOH4QcZZlkWmaStd1
+        D3WWZakn1z8YQEAxLjqD3j1qOY7jbOk/jbGDtm13wTiOcpomBf1GHDRNc6gn6rpWWmMHVETJdV33nA5/
+        11EUHfJ0jClnNOAdUAxwDQENgRhHxa8MkDMRBMGu48aABvErAzpJ0NEc6Pksy74z+JcOKAagA9AQeo5Q
+        cZPBu6coDMND3vd9lTca8OKrOaDzjnrO0zl45W+YKIpir+WcTrKpAx3qJEkStQjq9Hqu/3gPzhiGQdUC
+        o8Grk8w5/R7QxulibJASaDkd+qJVVbXrddQtz3M1dXhyAY/rcJ0ZKe649kKptxzqkwAAAABJRU5ErkJg
+        gg==
+</value>
+  </data>
+  <metadata name="timer1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>131, 17</value>
   </metadata>
 </root>
