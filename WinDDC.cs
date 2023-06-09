@@ -1,10 +1,34 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace MPowerDDC
 {
     public class WinDDC
     {
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+        private struct DISPLAY_DEVICE
+        {
+            [MarshalAs(UnmanagedType.U4)]
+            public int cb;
+
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
+            public string DeviceName;
+
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
+            public string DeviceString;
+
+            [MarshalAs(UnmanagedType.U4)]
+            public int StateFlags;
+
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
+            public string DeviceID;
+
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
+            public string DeviceKey;
+        }
+
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         private struct PHYSICAL_MONITOR
         {
@@ -13,9 +37,13 @@ namespace MPowerDDC
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
             public string szPhysicalMonitorDescription;
         }
+        private delegate bool MonitorEnumProc(IntPtr hMonitor, IntPtr hdc, ref IntPtr lprcClip, int dwData);
 
-        [DllImport("USER32.dll")]
-        private static extern IntPtr MonitorFromWindow(IntPtr hwnd, int dwFlags);
+        [DllImport("User32.dll")]
+        private static extern IntPtr EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, MonitorEnumProc lpfnEnum, int dwData);
+
+        [DllImport("User32.dll")]
+        private static extern bool EnumDisplayDevices(string lpDevice, int iDevNum, ref DISPLAY_DEVICE lpDisplayDevice, int dwFlags);
 
         [DllImport("DXVA2.dll")]
         private static extern bool GetNumberOfPhysicalMonitorsFromHMONITOR(IntPtr hMonitor, out uint pdwNumberOfPhysicalMonitors);
@@ -59,32 +87,69 @@ namespace MPowerDDC
             OffButton = 0x05,
         }
 
-        private static IntPtr hMonitor { get; set; }
-        private static IntPtr hPhysicalMonitor { get; set; }
-        private static PowerModeEnum PowerMode { get; set; }
+        public class Monitor
+        {
+            public IntPtr handle;
+            public string name;
+            public string id;
+
+            public override string ToString()
+            {
+                return name;
+            }
+        }
+
+        private static List<Monitor> Monitors = new List<Monitor>();
 
         public static void RefreshMonitor()
         {
-            hMonitor = MonitorFromWindow(IntPtr.Zero, 0x1);
-            PHYSICAL_MONITOR[] physicalMonitors = new PHYSICAL_MONITOR[1];
-            GetPhysicalMonitorsFromHMONITOR(hMonitor, 1, physicalMonitors);
-            hPhysicalMonitor = physicalMonitors[0].hPhysicalMonitor;
-            GetVCPFeatureAndVCPFeatureReply(hPhysicalMonitor, (byte)VCPCodeEnum.PowerMode, out IntPtr pvct, out uint dwPowerMode, out uint pdwMaximumValue);
-            PowerMode = (PowerModeEnum)dwPowerMode;
-            //Debug.WriteLine(PowerMode);
+            Monitors.Clear();
+            int hMonitors = 0;
+            EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, (IntPtr hMonitor, IntPtr hdc, ref IntPtr lprcClip, int dwData) =>
+            {
+                var device = new DISPLAY_DEVICE();
+                device.cb = Marshal.SizeOf(device);
+
+                EnumDisplayDevices(null, hMonitors++, ref device, 0);
+
+                var displayName = device.DeviceName;
+                var displayString = device.DeviceString;
+
+                GetNumberOfPhysicalMonitorsFromHMONITOR(hMonitor, out uint numPhysicalMonitors);
+                PHYSICAL_MONITOR[] physicalMonitors = new PHYSICAL_MONITOR[numPhysicalMonitors];
+                GetPhysicalMonitorsFromHMONITOR(hMonitor, numPhysicalMonitors, physicalMonitors);
+
+                for (int i = 0; i < physicalMonitors.Length; i++)
+                {
+                    EnumDisplayDevices(displayName, i, ref device, 0);
+                    Monitors.Add(new Monitor
+                    {
+                        handle = physicalMonitors[i].hPhysicalMonitor,
+                        name = $"{displayString} - {device.DeviceString} ({device.DeviceName})",
+                        id = device.DeviceID
+                    });
+                }
+
+                return true;
+            }, 0);
         }
 
         private static void PowerSwitch()
         {
-            var mode = PowerMode != PowerModeEnum.Off ? PowerModeEnum.OffButton : PowerModeEnum.On;
-            SetVCPFeature(hPhysicalMonitor, (byte)VCPCodeEnum.PowerMode, (uint)mode);
-            DestroyPhysicalMonitor(hPhysicalMonitor);
+            var monitor = Monitors.FirstOrDefault();
+            if (monitor == null) return;
+            GetVCPFeatureAndVCPFeatureReply(monitor.handle, (byte)VCPCodeEnum.PowerMode, out IntPtr pvct, out uint dwPowerMode, out uint pdwMaximumValue);
+            var mode = (PowerModeEnum)dwPowerMode != PowerModeEnum.Off ? PowerModeEnum.OffButton : PowerModeEnum.On;
+            SetVCPFeature(monitor.handle, (byte)VCPCodeEnum.PowerMode, (uint)mode);
+            DestroyPhysicalMonitor(monitor.handle);
         }
 
         private static void SourceSwitch(InputSelectEnum source)
         {
-            SetVCPFeature(hPhysicalMonitor, (byte)VCPCodeEnum.InputSelect, (uint)source);
-            DestroyPhysicalMonitor(hPhysicalMonitor);
+            var monitor = Monitors.FirstOrDefault();
+            if (monitor == null) return;
+            SetVCPFeature(monitor.handle, (byte)VCPCodeEnum.InputSelect, (uint)source);
+            DestroyPhysicalMonitor(monitor.handle);
         }
 
         public static void ProcessMessage(string message)

@@ -17,18 +17,21 @@ namespace MPowerDDC
         {
             notifyIcon1.Icon = this.Icon;
             HotkeyManager.Current.AddOrReplace("PowerSwitch", Keys.Alt | Keys.Escape, PowerSwitch);
-            HotkeyManager.Current.AddOrReplace("DisplayPort_1", Keys.Shift | Keys.ShiftKey | Keys.F1, SourceSwitch);
-            HotkeyManager.Current.AddOrReplace("DisplayPort_2", Keys.Shift | Keys.ShiftKey | Keys.F2, SourceSwitch);
-            HotkeyManager.Current.AddOrReplace("HDMI_1", Keys.Shift | Keys.ShiftKey | Keys.F3, SourceSwitch);
-            HotkeyManager.Current.AddOrReplace("HDMI_2", Keys.Shift | Keys.ShiftKey | Keys.F4, SourceSwitch);
-            HotkeyManager.Current.AddOrReplace("VGA_1", Keys.Shift | Keys.ShiftKey | Keys.F5, SourceSwitch);
-            HotkeyManager.Current.AddOrReplace("DVI_1", Keys.Shift | Keys.ShiftKey | Keys.F6, SourceSwitch);
+            HotkeyManager.Current.AddOrReplace("DisplayPort_1", Keys.Alt | Keys.D1, SourceSwitch);
+            HotkeyManager.Current.AddOrReplace("DisplayPort_2", Keys.Alt | Keys.D2, SourceSwitch);
+            HotkeyManager.Current.AddOrReplace("HDMI_1", Keys.Alt | Keys.D3, SourceSwitch);
+            HotkeyManager.Current.AddOrReplace("HDMI_2", Keys.Alt | Keys.D4, SourceSwitch);
+            HotkeyManager.Current.AddOrReplace("VGA_1", Keys.Alt | Keys.D5, SourceSwitch);
+            HotkeyManager.Current.AddOrReplace("DVI_1", Keys.Alt | Keys.D6, SourceSwitch);
         }
 
         private void fmMain_Shown(object sender, EventArgs e)
         {
             this.Hide();
-            new TcpService().Start();
+            Task.Run(() =>
+            {
+                var service = new TcpService();
+            });
         }
 
         private void PowerSwitch(object sender, HotkeyEventArgs e)

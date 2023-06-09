@@ -8,25 +8,31 @@ namespace MPowerDDC
 {
     public class TcpService
     {
-        private TcpListener listener;
+        private TcpListener listener = new TcpListener(IPAddress.Any, 7999);
 
-        public void Start()
+        public TcpService()
         {
-            listener = new TcpListener(IPAddress.Any, 7999);
-            listener.Start();
-            Accept();
+            StartAccept();
         }
 
-        private void Accept()
+        private void StartAccept()
         {
+            listener.Start();
             listener.BeginAcceptTcpClient(new AsyncCallback(AcceptCallback), listener);
         }
 
         private void AcceptCallback(IAsyncResult ar)
         {
-            Accept();
-            var client = listener.EndAcceptTcpClient(ar);
-            Process(client);
+            try
+            {
+                var client = listener.EndAcceptTcpClient(ar);
+                Process(client);
+            }
+            catch
+            {
+                listener.Stop();
+                StartAccept();
+            }
         }
 
         private void Process(TcpClient client)
@@ -35,6 +41,7 @@ namespace MPowerDDC
             var stream = client.GetStream();
             var length = stream.Read(buffer, 0, buffer.Length);
             var message = Encoding.UTF8.GetString(buffer, 0, length);
+            Log.WriteLine(message);
 
             if (message.Contains("[MRC]:"))
             {
